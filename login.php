@@ -11,7 +11,7 @@ if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo - A To-Do List for the forgettable ones</title>
+    <title>Notif - Notes for the forgettable ones</title>
 
 <!-- All the CSS goes here. -->
     <style>

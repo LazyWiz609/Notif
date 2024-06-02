@@ -11,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo - A To-Do List for the forgettable ones</title>
+    <title>Notif - Notes for the forgettable ones</title>
 </head>
     <style>
         .tox-editor-container .tox-edit-area iframe {
