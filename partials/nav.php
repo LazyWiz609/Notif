@@ -76,7 +76,7 @@
 
         .plus{
             color: white;
-            scale: 1.3;
+            scale: 1.7;
         }
 
         .footer{

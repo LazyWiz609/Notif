@@ -98,36 +98,61 @@ require 'partials/nav.php'
 ?>
     <?php
     $showAlert = null;
-    if($_SERVER ["REQUEST_METHOD"] == "POST"){
-            include 'partials/dbconnect.php';
-            $name = $_POST["username"];
-            $pass = $_POST["password"]; 
-            $email = $_POST["email"];
-            $sql = "SELECT * FROM `user` WHERE `username` = '$name'";
-            $result = mysqli_query($conn, $sql);
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        include 'partials/dbconnect.php';
+    
+        $name = $_POST["username"];
+        $pass = $_POST["password"];
+        $email = $_POST["email"];
+    
+
+        if (!empty($name) && !empty($pass) && !empty($email)) {
+            // SQL statement to check if the username already exists
+            $sql = "SELECT * FROM `user` WHERE `username` = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $name);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             $exists = mysqli_num_rows($result);
-            $sql = "SELECT * FROM `user` WHERE `email` = '$email'";
-            $result = mysqli_query($conn, $sql);
+    
+            // SQL statement to check if the email already exists
+            $sql = "SELECT * FROM `user` WHERE `email` = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             $exists2 = mysqli_num_rows($result);
-            if (!empty($name) && !empty($pass) && !empty($email)){
-            if($exists==0 && $exists2==0){
-                $sql = "INSERT INTO `user`(`username`, `password`, `email`, `dt`) VALUES ('$name','$pass','$email', CURRENT_TIMESTAMP )";
-                $result = mysqli_query($conn, $sql);
-                if($result){
+    
+
+            if ($exists == 0 && $exists2 == 0) {
+                // Hashing the password
+                $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
+    
+                // SQL statement to insert the new user
+                $sql = "INSERT INTO `user`(`username`, `password`, `email`, `dt`) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "sss", $name, $hashed_password, $email);
+                $result = mysqli_stmt_execute($stmt);
+    
+                // Check if the user was inserted successfully
+                if ($result) {
                     $showAlert = 1;
+    
+                    // Create a table for the user's notes
+                    $sql = "CREATE TABLE $name (sno INT AUTO_INCREMENT PRIMARY KEY, notes LONGTEXT, dat DATETIME) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+                    $result = mysqli_query($conn, $sql);
                 }
-            $sql = "CREATE TABLE $name (sno INT AUTO_INCREMENT PRIMARY KEY, notes LONGTEXT, dat DATETIME) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-            $result = mysqli_query($conn, $sql);
+            } elseif ($exists > 0) {
+                // Username already exists
+                $showAlert = 2;
+            } elseif ($exists2 > 0) {
+                // Email already exists
+                $showAlert = 3;
+            }
+        } else {
+            // Username, password, or email not provided
+            $showAlert = 4;
         }
-        if($exists>0){
-            $showAlert = 2;
-        }
-        if($exists2> 0){
-            $showAlert = 3;
-        }
-    } else{
-        $showAlert = 4;
-    }
     }
             
     ?>

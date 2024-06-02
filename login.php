@@ -100,27 +100,43 @@ function start_session() {
     }
 }
 $showAlert=null;
-if ($_SERVER ["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     include 'partials/dbconnect.php';
-            $name = $_POST["username"];
-            $pass = $_POST["password"]; 
-            $sql = "SELECT * FROM `user` WHERE `username` = '$name' AND `password` = '$pass'";
-            $result = mysqli_query($conn, $sql);
-            $exists = mysqli_num_rows($result);
-            if (!empty($name) && !empty($pass)){
-            if($exists==1) {
-                $showAlert = 1;
+
+    $name = $_POST["username"];
+    $pass = $_POST["password"];
+
+
+    if (!empty($name) && !empty($pass)) {
+
+        $sql = "SELECT * FROM `user` WHERE `username` = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+
+
+        mysqli_stmt_bind_param($stmt, "s", $name);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($row = mysqli_fetch_assoc($result)) {
+
+            if (password_verify($pass, $row['password'])) {
+
                 $_SESSION['loggedin'] = true;
                 $_SESSION['username'] = $name;
                 header('Location: userindex.php');
                 exit();
-            }
-            else{
+            } else {
+                // Password is incorrect
                 $showAlert = 2;
             }
-        }else{
-            $showAlert = 3;
+        } else {
+            // User not found
+            $showAlert = 1;
         }
+    } else {
+        // Username or password not provided
+        $showAlert = 3;
+    }
 }
 
 ?>
@@ -134,7 +150,7 @@ if ($_SERVER ["REQUEST_METHOD"] == "POST") {
             <p style="color: white; font-size:x-small; font-family: Sans-serif; margin-bottom:5%">
                 <?php 
                     if($showAlert==1){
-                        echo "Succcessful Login";
+                        echo "User not found";
                     }
                     if($showAlert ==2){
                         echo "Wrong Username or Password.";
