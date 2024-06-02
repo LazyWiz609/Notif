@@ -1,2 +1,0 @@
-<?php
-echo "<p>dhajdasjkdhashdasdsa</p>\n<p style=\"text-align: center;\"><strong>Hello tis is lazywiz</strong></p>\n<p style=\"text-align: center;\">dsadajdkajkdjaskdasd</p>\n<p style=\"text-align: center;\"><em>sadasdasda</em></p>\n<p style=\"text-align: center;\"><span style=\"text-decoration: underline;\"><em>dadsadasdsadasda</em></span></p>\n<p style=\"text-align: center;\"><s>dadasdasdasda</s></p>\n<p style=\"text-align: center;\"><s>😝</s></p>";
